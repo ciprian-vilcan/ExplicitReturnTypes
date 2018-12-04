@@ -1,0 +1,274 @@
+﻿<#@ template debug="true" hostSpecific="true" #>
+<#@ import namespace="System.Diagnostics" #>
+<#@ assembly name="System.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+<#
+ this.Write(new Namespace(16).ToCode()); #>
+<#@ include file="T4Indentation.ttinclude" #>
+<#+
+    private interface IT4Convertible
+    {
+        string ToCode();
+    }
+
+    private class GenericParameter : IT4Convertible
+    {
+        private readonly int optionNumber;
+
+        public GenericParameter(int optionNumber)
+        {
+            this.optionNumber = optionNumber;
+        }
+
+        /// <inheritdoc />
+        public string ToCode()
+        {
+            return $"T{this.optionNumber}";
+        }
+    }
+
+    private class GenericParameterList : IT4Convertible
+    {
+        private readonly int numberOfOptions;
+
+        public GenericParameterList(int numberOfOptions)
+        {
+            this.numberOfOptions = numberOfOptions;
+        }
+
+        /// <inheritdoc />
+        public string ToCode()
+        {
+            return $"<{string.Join(", ", Enumerable.Range(1, this.numberOfOptions).Select(i => new GenericParameter(i).ToCode()))}>";
+        }
+    }
+
+    private class Namespace : IT4Convertible
+    {
+        public Namespace(int numberOfOptions)
+        {
+			this.NamespaceBody = new NamespaceBody(numberOfOptions);
+        }
+
+        private string Name { get; } = "namespace ExpressiveReturnTypes";
+
+		private NamespaceBody NamespaceBody { get; }
+
+        /// <inheritdoc />
+        public string ToCode()
+        {
+            return Joiner.Join(this.Name, "{", IncreaseIndent(this.NamespaceBody.ToCode(), 1), "}");
+        }
+    }
+
+    private class NamespaceBody : IT4Convertible
+    {
+        public NamespaceBody(int numberOfOptions)
+        {
+			this.ClassDefinitions = Enumerable.Range(1, numberOfOptions).Select(i => new ClassDefinition(i));
+        }
+
+        private string Using { get; } = "using System;";
+
+        private IEnumerable<ClassDefinition> ClassDefinitions { get; }
+
+        /// <inheritdoc />
+        public string ToCode()
+        {
+            return Joiner.JoinD(new[] { this.Using }.Concat(this.ClassDefinitions.Select(c => c.ToCode())).ToArray());
+        }
+    }
+
+    private class ClassDefinition : IT4Convertible
+    {
+        public ClassDefinition(int numberOfOptions)
+        {
+            this.Header = new ClassHeader(numberOfOptions);
+            this.Body = new ClassBody(numberOfOptions);
+        }
+
+        private ClassHeader Header { get; }
+
+        private ClassBody Body { get; }
+
+        /// <inheritdoc />
+        public string ToCode()
+        {
+            return Joiner.Join(this.Header.ToCode(), "{", IncreaseIndent(this.Body.ToCode(), 1), "}");
+        }
+    }
+
+	private class MatchMethod : IT4Convertible
+	{
+	    public MatchMethod(int numberOfOptions)
+	    {
+			this.MethodHeader = new MatchMethodHeader(numberOfOptions);
+			this.MethodBody = new MatchMethodBody(numberOfOptions);
+	    }
+
+	    private MatchMethodHeader MethodHeader { get; }
+
+		private MatchMethodBody MethodBody { get; }
+
+	    /// <inheritdoc />
+	    public string ToCode()
+	    {
+	        return Joiner.Join(this.MethodHeader.ToCode(), "{", IncreaseIndent(this.MethodBody.ToCode(), 1), "}");
+	    }
+	}
+
+	private class MatchMethodHeader : IT4Convertible
+	{
+	    public MatchMethodHeader(int numberOfOptions)
+	    {
+	        this.Parameters = Enumerable.Range(1, numberOfOptions).Select(i => new ParameterFunc(i));
+	    }
+
+		private IEnumerable<ParameterFunc> Parameters { get; }
+
+	    /// <inheritdoc />
+	    public string ToCode()
+	    {
+	        return $"public TResult Match<TResult>({string.Join(", ", this.Parameters.Select(p => p.ToCode()))})";
+	    }
+	}
+
+    private class MatchMethodBody : IT4Convertible
+    {
+        public MatchMethodBody(int numberOfOptions)
+        {
+            this.Conditions = Enumerable.Range(1, numberOfOptions)
+                .Select(i => $"this.underlyingValue is {new GenericParameter(i).ToCode()}")
+                .ToList();
+            this.Thens = Enumerable.Range(1, numberOfOptions)
+                .Select(i => $"func{i}(({new GenericParameter(i).ToCode()})this.underlyingValue)")
+                .ToList();
+        }
+
+		private IEnumerable<string> Conditions { get; }
+
+		private IEnumerable<string> Thens { get; }
+
+        /// <inheritdoc />
+        public string ToCode()
+        {
+            if (this.Conditions.Count() == 1)
+            {
+                return $"return func1(({new GenericParameter(1).ToCode()})this.underlyingValue);";
+            }
+            else
+            {
+                var chainedIfThenElses = this.Conditions.Take(this.Conditions.Count() - 1)
+                    .Zip(this.Thens.Take(this.Thens.Count() - 1), (cond, then) => $"{cond} ? {then}")
+                    .Aggregate((l, r) => $"{l} : {r}");
+                return $"return {chainedIfThenElses} : { this.Thens.Last() };";
+            }
+        }
+    }
+
+	private class ParameterFunc : IT4Convertible
+	{
+	    private readonly int optionNumber;
+
+	    public ParameterFunc(int optionNumber)
+	    {
+	        this.optionNumber = optionNumber;
+	    }
+
+	    /// <inheritdoc />
+	    public string ToCode()
+	    {
+	        return $"Func<T{this.optionNumber}, TResult> func{this.optionNumber}";
+	    }
+	}
+
+    private class ClassHeader : IT4Convertible
+    {
+        private readonly int numberOfOptions;
+
+        public ClassHeader(int numberOfOptions)
+        {
+            this.numberOfOptions = numberOfOptions;
+        }
+
+        /// <inheritdoc />
+        public string ToCode()
+        {
+            var parameterList = new GenericParameterList(this.numberOfOptions).ToCode();
+
+            return $"public class Either{parameterList} : IEither{parameterList}";
+        }
+    }
+
+    private class ClassBody : IT4Convertible
+    {
+        public ClassBody(int numberOfOptions)
+        {
+            this.Constructors = Enumerable.Range(1, numberOfOptions).Select(i => new Constructor(i));
+            this.ImplicitOperators = Enumerable.Range(1, numberOfOptions).Select(i => new ImplicitOperator(numberOfOptions, i));
+			this.MatchMethod = new MatchMethod(numberOfOptions);
+        }
+
+        private string UnderlyingValue { get; } = "private readonly object underlyingValue;";
+
+		private IEnumerable<Constructor> Constructors { get; }
+
+		private IEnumerable<ImplicitOperator> ImplicitOperators { get; }
+
+        private MatchMethod MatchMethod { get; }
+
+        /// <inheritdoc />
+        public string ToCode()
+        {
+            return Joiner.JoinD(
+                this.UnderlyingValue, 
+                Joiner.JoinD(this.Constructors.Select(c => c.ToCode()).ToArray()),
+                Joiner.JoinD(this.ImplicitOperators.Select(c => c.ToCode()).ToArray()),
+                this.MatchMethod.ToCode());
+        }
+    }
+
+    private class ImplicitOperator : IT4Convertible
+    {
+        private readonly int numberOfOptions;
+
+        private readonly int optionNumber;
+
+        public ImplicitOperator(int numberOfOptions, int optionNumber)
+        {
+            this.numberOfOptions = numberOfOptions;
+            this.optionNumber = optionNumber;
+        }
+
+        /// <inheritdoc />
+        public string ToCode()
+        {
+		    var parameterList = new GenericParameterList(this.numberOfOptions).ToCode();
+            var genericParameter = new GenericParameter(this.optionNumber).ToCode();
+
+            return $"public static implicit operator Either{parameterList}({genericParameter} value) => new Either{parameterList}(value);";
+        }
+    }
+
+    private class Constructor : IT4Convertible
+    {
+        public Constructor(int optionNumber)
+        {
+            this.OptionNumber = optionNumber;
+        }
+
+        private int OptionNumber { get; }
+
+        /// <inheritdoc />
+        public string ToCode()
+        {
+            return Joiner.Join(
+                $"public Either(T{this.OptionNumber} value)",
+                "{",
+                IncreaseIndent("this.underlyingValue = value;", 1),
+                "}");
+        }
+    }
+#>

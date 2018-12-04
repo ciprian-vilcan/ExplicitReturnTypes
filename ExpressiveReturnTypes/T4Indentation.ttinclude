@@ -1,0 +1,20 @@
+﻿<#@ template language="C#" #>
+<#@ assembly name="System.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" #>
+<#@ import namespace="System.Linq" #>
+
+<#+
+    private static string IncreaseIndent(string input, int numberOfTabs, int tabSize = 4, char character = ' ')
+    {
+        var addedIndent = new string(Enumerable.Repeat(character, numberOfTabs * tabSize).ToArray());
+        return 
+            addedIndent 
+            + input.Replace(Environment.NewLine, Environment.NewLine + addedIndent);
+    }
+
+    private static class Joiner
+    {
+        public static string Join(params string[] strings) => string.Join(Environment.NewLine, strings);
+
+        public static string JoinD(params string[] strings) => string.Join(Environment.NewLine + Environment.NewLine, strings);
+    }
+#>

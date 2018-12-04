@@ -1,0 +1,102 @@
+﻿<#@ template debug="true" hostSpecific="true" #>
+<#@ assembly name="System.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+<#
+		WriteLine(new Namespace().ToCode());
+#>
+<#@ include file="T4Indentation.ttinclude" #>
+<#+
+    private interface IT4Convertible
+    {
+        string ToCode();
+    }
+
+    private class Namespace : IT4Convertible
+    {
+        public Namespace()
+        {
+            this.NamespaceBody = new NamespaceBody();
+        }
+
+        /// <inheritdoc />
+        public string ToCode()
+        {
+            return Joiner.Join("namespace ExpressiveReturnTypes", "{", IncreaseIndent(this.NamespaceBody.ToCode(), 1), "}");
+        }
+
+        public NamespaceBody NamespaceBody { get; set; }
+    }
+
+    private class NamespaceBody : IT4Convertible
+    {
+        public NamespaceBody()
+        {
+            this.Anyes = Enumerable.Range(1, 16).Select(i => new AnyDefinition(i));
+        }
+
+        /// <inheritdoc />
+        public string ToCode()
+        {
+            return Joiner.JoinD(new [] { "using System;" }.Concat(this.Anyes.Select(a => a.ToCode())).ToArray());
+        }
+
+        public IEnumerable<AnyDefinition> Anyes { get; set; }
+
+        
+    }
+
+    private class AnyDefinition : IT4Convertible
+    {
+        private readonly int numberOfOptions;
+
+        public AnyDefinition(int numberOfOptions)
+        {
+            this.numberOfOptions = numberOfOptions;
+			this.InterfaceBody = new InterfaceBody(numberOfOptions);
+        }
+
+        /// <inheritdoc />
+        public string ToCode()
+        {
+            var parameters = Enumerable.Range(1, this.numberOfOptions).Select(i => $"out T{i}").Aggregate((l, r) => $"{l}, {r}");
+            var interfaceHeader = $"public interface IAny<{parameters}>";
+
+
+            return Joiner.Join(interfaceHeader, "{", this.InterfaceBody.ToCode(), "}");
+        }
+
+        private InterfaceBody InterfaceBody { get; set; }
+    }
+
+    private class InterfaceBody : IT4Convertible
+    {
+        private readonly int numberOfOptions;
+
+        public InterfaceBody(int numberOfOptions)
+        {
+            this.numberOfOptions = numberOfOptions;
+        }
+
+        /// <inheritdoc />
+        public string ToCode()
+        {
+            var parameters = Enumerable.Range(1, this.numberOfOptions).Select(i => $"IMaybe<T{i}>")
+                .Concat(new[] { "TResult" })
+                .Aggregate((l, r) => $"{l}, {r}");
+            var methodHeader = $"TResult Aggregate<TResult>(Func<{parameters}> func);";
+
+            return new[]
+                       {
+                           @"/// <summary>",
+                           @"/// Aggregates (binds) the contents of the data type by providing a func treating all possible cases.",
+                           @"/// </summary>", @"/// <param name=""func""> A func to aggregate the possible states. </param>",
+                           @"/// <typeparam name=""TResult""> The type of result. </typeparam>",
+                           @"/// <returns> The <see cref=""TResult""/>. </returns>", methodHeader
+                       }
+                .Select(line => IncreaseIndent(line, 1))
+                .Aggregate((l, r) => $"{l}{Environment.NewLine}{r}");
+        }
+    }
+
+    #>
