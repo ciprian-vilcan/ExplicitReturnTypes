@@ -23,9 +23,4 @@
         /// </returns>
         TResult Match<TResult>(Func<T, TResult> some, Func<TResult> none);
     }
-
-    public interface IMaybe : IEither<Nothing, Nothing>
-    {
-        TResult Match<TResult>(Func<TResult> some, Func<TResult> none);
-    }
 }

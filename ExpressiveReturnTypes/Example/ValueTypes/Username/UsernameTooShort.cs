@@ -1,6 +1,6 @@
 ﻿namespace ExpressiveReturnTypes.Example.ValueTypes.Username
 {
-    public class UsernameTooShort
+    public class UsernameTooShort : ExpectedException
     {
     }
 }

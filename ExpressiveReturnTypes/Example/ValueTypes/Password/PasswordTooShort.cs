@@ -1,6 +1,8 @@
 ﻿namespace ExpressiveReturnTypes.Example.ValueTypes.Password
 {
-    public class PasswordTooShort
+    using ExpressiveReturnTypes.Example.ValueTypes.Username;
+
+    public class PasswordTooShort : ExpectedException
     {
     }
 }

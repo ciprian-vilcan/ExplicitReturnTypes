@@ -1,6 +1,8 @@
 ﻿namespace ExpressiveReturnTypes.Example.ValueTypes.Email
 {
-    public class UntrustedProvider
+    using ExpressiveReturnTypes.Example.ValueTypes.Username;
+
+    public class UntrustedProvider : ExpectedException
     {
     }
 }

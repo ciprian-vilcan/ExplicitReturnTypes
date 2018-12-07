@@ -1,6 +1,8 @@
 ﻿namespace ExpressiveReturnTypes.Example.ValueTypes.Email.ThatIsNotInUse
 {
-    public class EmailAlreadyInUse
+    using ExpressiveReturnTypes.Example.ValueTypes.Username;
+
+    public class EmailAlreadyInUse : ExpectedException
     {
     }
 }

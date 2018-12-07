@@ -1,7 +1,5 @@
 ﻿namespace ExpressiveReturnTypes.Example.ValueTypes.Password
 {
-    using ExpressiveReturnTypes.Example.Flows.CreateUser;
-
     public class Password : IPassword
     {
         private Password(string value)
@@ -13,19 +11,19 @@
 
         public static implicit operator string(Password instance) => instance.Value;
 
-        public class Factory : IMethod<InstantiateIPasswordParams, IEither<IPassword, InvalidPassword>>
+        public class Factory : IMethod<string, IEither<IPassword, InvalidPassword>>
         {
-            public IEither<IPassword, InvalidPassword> Execute(InstantiateIPasswordParams parameters)
+            public IEither<IPassword, InvalidPassword> Execute(string password)
             {
                 Either<Password, InvalidPassword> result;
 
-                if (parameters.Value.Length < 12)
+                if (password.Length < 12)
                 {
-                    result = new PasswordTooShort().ToInvalidPassword();
+                    result = new InvalidPassword(new PasswordTooShort());
                 }
                 else
                 {
-                    result = new Password(parameters.Value);
+                    result = new Password(password);
                 }
 
                 return result;

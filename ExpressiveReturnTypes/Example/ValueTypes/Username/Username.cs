@@ -2,8 +2,6 @@
 {
     using System;
 
-    using ExpressiveReturnTypes.Example.Flows.CreateUser;
-
     public class Username : IUsername
     {
         private Username(string username)
@@ -15,7 +13,7 @@
 
         public static implicit operator string(Username instance) => instance.Value;
 
-        public class Factory : IMethod<InstantiateIUsernameParams, IEither<IUsername, InvalidUsername>>
+        public class Factory : IMethod<string, IEither<IUsername, InvalidUsername>>
         {
             private readonly Func<string, bool> usernameExists;
 
@@ -24,21 +22,21 @@
                 this.usernameExists = usernameExists;
             }
 
-            public IEither<IUsername, InvalidUsername> Execute(InstantiateIUsernameParams username)
+            public IEither<IUsername, InvalidUsername> Execute(string username)
             {
                 Either<Username, InvalidUsername> result;
 
-                if (username.Value.Length < 2)
+                if (username.Length < 2)
                 {
                     result = new InvalidUsername(new UsernameTooShort());
                 }
-                else if (this.usernameExists(username.Value))
+                else if (this.usernameExists(username))
                 {
                     result = new InvalidUsername(new UsernameTaken());
                 }
                 else
                 {
-                    result = new Username(username.Value);
+                    result = new Username(username);
                 }
 
                 return result;

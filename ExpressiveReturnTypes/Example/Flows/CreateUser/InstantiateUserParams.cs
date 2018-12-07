@@ -4,9 +4,9 @@
     using ExpressiveReturnTypes.Example.ValueTypes.Password;
     using ExpressiveReturnTypes.Example.ValueTypes.Username;
 
-    public class CreateUserParams
+    public class InstantiateUserParams
     {
-        public CreateUserParams(InstantiateIUsernameParams username, InstantiateIPasswordParams password, InstantiateIEmailParams email)
+        public InstantiateUserParams(InstantiateIUsernameParams username, InstantiateIPasswordParams password, InstantiateIEmailParams email)
         {
             this.Username = username;
             this.Password = password;

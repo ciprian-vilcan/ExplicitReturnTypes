@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpressiveReturnTypes", "Ex
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication", "ConsoleApplication\ConsoleApplication.csproj", "{EB32721A-83C3-4649-80C4-8DB74790B7D4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpressiveExceptions", "ExpressiveExceptions\ExpressiveExceptions.csproj", "{14322EA8-AFBC-4DCB-B320-2F4E031E4980}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,10 +21,6 @@ Global
 		{EB32721A-83C3-4649-80C4-8DB74790B7D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EB32721A-83C3-4649-80C4-8DB74790B7D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EB32721A-83C3-4649-80C4-8DB74790B7D4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{14322EA8-AFBC-4DCB-B320-2F4E031E4980}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{14322EA8-AFBC-4DCB-B320-2F4E031E4980}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{14322EA8-AFBC-4DCB-B320-2F4E031E4980}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{14322EA8-AFBC-4DCB-B320-2F4E031E4980}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

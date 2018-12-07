@@ -2,13 +2,15 @@
 {
     using System;
 
-    public class InvalidPassword : IEither<PasswordTooShort>
-    {
-        private readonly IEither<PasswordTooShort> innerEither;
+    using ExpressiveReturnTypes.Example.ValueTypes.Username;
 
-        public InvalidPassword(IEither<PasswordTooShort> innerEither)
+    public class InvalidPassword : CompositeExpectedException, IEither<PasswordTooShort>
+    {
+        private readonly Either<PasswordTooShort> innerEither;
+
+        public InvalidPassword(PasswordTooShort passwordTooShort) : base(passwordTooShort)
         {
-            this.innerEither = innerEither;
+            this.innerEither = passwordTooShort;
         }
 
         /// <inheritdoc />
@@ -16,11 +18,5 @@
         {
             return this.innerEither.Match(aFunc);
         }
-    }
-
-    public static class InvalidPassword_Extensions
-    {
-        public static InvalidPassword ToInvalidPassword(this PasswordTooShort instance)
-            => new InvalidPassword(new Either<PasswordTooShort>(instance));
     }
 }

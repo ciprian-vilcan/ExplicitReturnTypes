@@ -1,13 +1,11 @@
 ﻿namespace ExpressiveReturnTypes.Example.ValueTypes.Email.ThatIsNotInUse
 {
-    using ExpressiveReturnTypes.Example.Flows.CreateUser;
-
-    public class IsEmailInUse : IMethod<IEmail, IMaybe>
+    public class IsEmailInUse : IMethod<IEmail, bool>
     {
         /// <inheritdoc />
-        public IMaybe Execute(IEmail parameters)
+        public bool Execute(IEmail parameters)
         {
-            Maybe result = parameters.Value == "vasile@vasile.com";
+            var result = parameters.Value == "vasile@vasile.com";
 
             return result;
         }

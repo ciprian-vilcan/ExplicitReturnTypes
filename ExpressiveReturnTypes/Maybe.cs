@@ -32,31 +32,4 @@
         /// <inheritdoc />
         public override string ToString() => this.innerEither.Match(some => some.ToString(), none => none.ToString());
     }
-
-    public class Maybe : IMaybe
-    {
-        private readonly bool innerEither;
-
-        public Maybe(bool isSome = false)
-        {
-            this.innerEither = isSome;
-        }
-
-        /// <inheritdoc />
-        public TResult Match<TResult>(Func<TResult> some, Func<TResult> none)
-        {
-            return this.innerEither ? some() : none();
-        }
-
-        public static implicit operator Maybe(bool value) => new Maybe(value);
-
-        /// <inheritdoc />
-        public TResult Match<TResult>(Func<Nothing, TResult> aFunc, Func<Nothing, TResult> bFunc)
-        {
-            return this.innerEither ? aFunc(Nothing.Instance) : bFunc(Nothing.Instance);
-        }
-
-        /// <inheritdoc />
-        public override string ToString() => this.innerEither ? "Some" : "Nothing";
-    }
 }

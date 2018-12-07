@@ -4,26 +4,18 @@
 
     public static class MatchOverloads
     {
-        public static TResult MatchWithDefault<T1, T2, T3, TResult>(
-            this IEither<T1, T2, T3> either,
-            Func<T1, TResult> aFunc,
-            TResult otherDefaultValue)
-            => either.Match(
-                aFunc,
-                t2 => otherDefaultValue,
-                t3 => otherDefaultValue);
-
-        public static TResult MatchWithDefault<T1, T2, T3, TCommon, TResult>(
-            this IEither<T1, T2, T3> either,
-            Func<T1, TResult> aFunc,
-            Func<TCommon, TResult> otherDefaultFunc) 
-            where T2 : TCommon 
-            where T3 : TCommon
+        public static TResult Match<T, TResult>(this IMaybe<T> maybe, Func<T, TResult> someFunc, Func<TResult> noneFunc)
         {
-            return either.Match(
-                aFunc,
-                t2 => otherDefaultFunc(t2),
-                t3 => otherDefaultFunc(t3));
+            return maybe.Match(
+                someFunc,
+                none => noneFunc());
+        }
+
+        public static TResult Match<T, TResult>(this IMaybe<T> maybe, Func<T, TResult> someFunc, TResult noneDefault = default(TResult))
+        {
+            return maybe.Match(
+                someFunc,
+                none => noneDefault);
         }
 
         public static TResult Match<TA1, TB1, TA2, TB2, TResult>(
@@ -62,6 +54,32 @@
                     bad2 => either3.Match(
                         good3 => new Any<TBad1, TBad2, TBad3>(bad1, bad2),
                         bad3 => new Any<TBad1, TBad2, TBad3>(bad1, bad2, bad3))));
+
+            return result;
+        }
+
+        public static IEither<TGood, TBad> Match<A1, A2, B1, B2, C1, C2, TGood, TBad>(
+            this IEither<A1, A2> a,
+            IEither<B1, B2> b,
+            IEither<C1, C2> c,
+            Func<A1, B1, C1, TGood> goodFunc,
+            Func<IMaybe<A2>, IMaybe<B2>, IMaybe<C2>, TBad> badFunc)
+        {
+            var result = a.Match(
+                a1 => b.Match(
+                    b1 => c.Match<Either<TGood, TBad>>(
+                        c1 => goodFunc(a1, b1, c1),
+                        c2 => badFunc(Nothing.Instance.ToMaybe<A2>(), Nothing.Instance.ToMaybe<B2>(), c2.ToMaybe())),
+                    b2 => c.Match(
+                        c1 => badFunc(Nothing.Instance.ToMaybe<A2>(), b2.ToMaybe(), Nothing.Instance.ToMaybe<C2>()),
+                        c2 => badFunc(Nothing.Instance.ToMaybe<A2>(), b2.ToMaybe(), c2.ToMaybe()))),
+                a2 => b.Match(
+                    b1 => c.Match<Either<TGood, TBad>>(
+                        c1 => badFunc(a2.ToMaybe(), Nothing.Instance.ToMaybe<B2>(), Nothing.Instance.ToMaybe<C2>()),
+                        c2 => badFunc(a2.ToMaybe(), Nothing.Instance.ToMaybe<B2>(), c2.ToMaybe())),
+                    b2 => c.Match(
+                        c1 => badFunc(a2.ToMaybe(), Nothing.Instance.ToMaybe<B2>(), Nothing.Instance.ToMaybe<C2>()),
+                        c2 => badFunc(a2.ToMaybe(), b2.ToMaybe(), c2.ToMaybe()))));
 
             return result;
         }

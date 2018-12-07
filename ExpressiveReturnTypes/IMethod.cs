@@ -1,4 +1,4 @@
-﻿namespace ExpressiveReturnTypes.Example.Flows.CreateUser.FullyFunctional
+﻿namespace ExpressiveReturnTypes
 {
     using System;
 

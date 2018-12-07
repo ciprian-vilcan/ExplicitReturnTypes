@@ -19,13 +19,4 @@
 
         public IEmail Email { get; }
     }
-
-    public interface IUser
-    {
-        IUsername Username { get; }
-
-        IPassword Password { get; }
-
-        IEmail Email { get; }
-    }
 }

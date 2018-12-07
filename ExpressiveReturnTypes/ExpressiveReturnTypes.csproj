@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Humanizer, Version=2.5.0.0, Culture=neutral, PublicKeyToken=979442b78dfc278e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Humanizer.Core.2.5.16\lib\netstandard2.0\Humanizer.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Reactive, Version=4.1.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
@@ -63,6 +66,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Eithers.tt</DependentUpon>
     </Compile>
+    <Compile Include="Either_IsExtensions.cs" />
+    <Compile Include="Example\Flows\CreateUser\IUser.cs" />
+    <Compile Include="Example\ValueTypes\Email\ThatIsNotInUse\InvalidEmailThatIsNotInUse.cs" />
+    <Compile Include="Example\ValueTypes\Username\CompositeExpectedException.cs" />
+    <Compile Include="Example\ValueTypes\Username\ExpectedException.cs" />
     <Compile Include="IAnys.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -75,14 +83,10 @@
     </Compile>
     <Compile Include="Example\ValueTypes\Email\ThatIsNotInUse\AlreadyInuse.cs" />
     <Compile Include="Any.cs" />
-    <Compile Include="Example\Flows\CreateUser\CreateUserParams.cs" />
-    <Compile Include="Example\Flows\CreateUser\IMethod.cs" />
+    <Compile Include="IMethod.cs" />
     <Compile Include="Example\Flows\CreateUser\User.cs" />
-    <Compile Include="Example\Flows\CreateUser\CreateUserService.cs" />
     <Compile Include="IMaybeExtensions.cs" />
     <Compile Include="IMaybeIEitherExtensions.cs" />
-    <Compile Include="Example\ValueTypes\Password\InstantiateIPasswordParams.cs" />
-    <Compile Include="Example\ValueTypes\Username\InstantiateIUsernameParams.cs" />
     <Compile Include="Example\ValueTypes\Password\InvalidPassword.cs" />
     <Compile Include="Example\ValueTypes\Password\IPassword.cs" />
     <Compile Include="Example\ValueTypes\Username\IUsername.cs" />
@@ -114,7 +118,6 @@
     <Compile Include="Example\ValueTypes\Username\UsernameTooShort.cs" />
     <Compile Include="Example\ValueTypes\Email\IEmail.cs" />
     <Compile Include="Example\ValueTypes\Email\ThatIsNotInUse\IEmailThatIsNotInUse.cs" />
-    <Compile Include="Example\ValueTypes\Email\InstantiateEmailParams.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

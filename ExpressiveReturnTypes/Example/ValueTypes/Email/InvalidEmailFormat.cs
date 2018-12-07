@@ -1,6 +1,8 @@
 ﻿namespace ExpressiveReturnTypes.Example.ValueTypes.Email
 {
-    public class InvalidEmailFormat
+    using ExpressiveReturnTypes.Example.ValueTypes.Username;
+
+    public class InvalidEmailFormat : ExpectedException
     {
     }
 }
